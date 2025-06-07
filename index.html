@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tribal Language Translator</title>
+    <style>
+        body { font-family: Arial; text-align: center; margin-top: 50px; }
+        input, button { padding: 10px; margin: 10px; width: 300px; }
+        .output { margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <h1>Tribal Multilingual Translator</h1>
+    <form method="POST">
+        <!-- autocomplete -->
+<input type="text" name="hindi_text" id="hindi_input" placeholder="हिंदी में लिखिए..." autocomplete="off" required>
+
+<ul id="suggestions" style="list-style: none; padding: 0;"></ul>
+
+<script>
+document.getElementById("hindi_input").addEventListener("input", function() {
+    const query = this.value;
+    if (query.length === 0) {
+        document.getElementById("suggestions").innerHTML = "";
+        return;
+    }
+
+    fetch(`/suggest?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+            let list = "";
+            data.forEach(item => {
+                list += `<li onclick="selectSuggestion('${item}')">${item}</li>`;
+            });
+            document.getElementById("suggestions").innerHTML = list;
+        });
+});
+
+function selectSuggestion(text) {
+    document.getElementById("hindi_input").value = text;
+    document.getElementById("suggestions").innerHTML = "";
+}
+</script>
+
+ <!-- end autocomplete -->
+        <br>
+        <button type="submit">Translate</button>
+    </form>
+
+    {% if output %}
+    <div class="output">
+        <h3>Results:</h3>
+        <p><strong>English:</strong> {{ output.eng }}</p>
+        <p><strong>Pardhi:</strong> {{ output.pardhi }}</p>
+        <p><strong>Kolami:</strong> {{ output.kolami }}</p>
+    </div>
+    {% endif %}
+</body>
+</html>
