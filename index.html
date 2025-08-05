@@ -1,15 +1,9 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 
-=======
-
-<!DOCTYPE html>
->>>>>>> 0183ded73446993c841e4fc07fe2fa33811c8a0b
 <html>
 <head>
     <title>Tribal Language Translator</title>
     <style>
-<<<<<<< HEAD
         body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 50px; }
         .container { background: #fff; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         input, button { padding: 10px; margin: 10px; width: calc(100% - 40px); border: 1px solid #ccc; border-radius: 5px; }
@@ -41,20 +35,6 @@
     </div>
     {% endif %}
 </div>
-=======
-        body { font-family: Arial; text-align: center; margin-top: 50px; }
-        input, button { padding: 10px; margin: 10px; width: 300px; }
-        .output { margin-top: 30px; }
-    </style>
-</head>
-<body>
-    <h1>Tribal Multilingual Translator</h1>
-    <form method="POST">
-        <!-- autocomplete -->
-<input type="text" name="hindi_text" id="hindi_input" placeholder="हिंदी में लिखिए..." autocomplete="off" required>
-
-<ul id="suggestions" style="list-style: none; padding: 0;"></ul>
->>>>>>> 0183ded73446993c841e4fc07fe2fa33811c8a0b
 
 <script>
 document.getElementById("hindi_input").addEventListener("input", function() {
@@ -79,7 +59,6 @@ function selectSuggestion(text) {
     document.getElementById("hindi_input").value = text;
     document.getElementById("suggestions").innerHTML = "";
 }
-<<<<<<< HEAD
 
 function startVoiceInput() {
     if ('webkitSpeechRecognition' in window) {
@@ -101,7 +80,50 @@ function startVoiceInput() {
 </script>
 ```
 
-=======
+</body>
+</html>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tribal Language Translator</title>
+    <style>
+        body { font-family: Arial; text-align: center; margin-top: 50px; }
+        input, button { padding: 10px; margin: 10px; width: 300px; }
+        .output { margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <h1>Tribal Multilingual Translator</h1>
+    <form method="POST">
+        <!-- autocomplete -->
+<input type="text" name="hindi_text" id="hindi_input" placeholder="हिंदी में लिखिए..." autocomplete="off" required>
+
+<ul id="suggestions" style="list-style: none; padding: 0;"></ul>
+
+<script>
+document.getElementById("hindi_input").addEventListener("input", function() {
+    const query = this.value;
+    if (query.length === 0) {
+        document.getElementById("suggestions").innerHTML = "";
+        return;
+    }
+
+    fetch(`/suggest?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+            let list = "";
+            data.forEach(item => {
+                list += `<li onclick="selectSuggestion('${item}')">${item}</li>`;
+            });
+            document.getElementById("suggestions").innerHTML = list;
+        });
+});
+
+function selectSuggestion(text) {
+    document.getElementById("hindi_input").value = text;
+    document.getElementById("suggestions").innerHTML = "";
+}
 </script>
 
  <!-- end autocomplete -->
@@ -117,6 +139,5 @@ function startVoiceInput() {
         <p><strong>Kolami:</strong> {{ output.kolami }}</p>
     </div>
     {% endif %}
->>>>>>> 0183ded73446993c841e4fc07fe2fa33811c8a0b
 </body>
 </html>
