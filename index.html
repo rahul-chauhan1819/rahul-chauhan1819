@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Tribal Language Translator</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 50px; }
+        .container { background: #fff; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input, button { padding: 10px; margin: 10px; width: calc(100% - 40px); border: 1px solid #ccc; border-radius: 5px; }
+        button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .output { margin-top: 30px; text-align: left; }
+        #suggestions { border: 1px solid #ccc; background: #fff; position: absolute; max-height: 150px; overflow-y: auto; width: calc(100% - 40px); margin: 0 auto; left: 0; right: 0; }
+        #suggestions li { padding: 5px; cursor: pointer; }
+        #suggestions li:hover { background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tribal Multilingual Translator</h1>
+        <form method="POST">
+            <input type="text" name="hindi_text" id="hindi_input" placeholder="हिंदी या Hinglish में लिखिए..." autocomplete="off" required>
+            <button type="button" onclick="startVoiceInput()">🎤 Voice Search</button>
+            <ul id="suggestions" style="list-style: none; padding: 0;"></ul>
+            <button type="submit">Translate</button>
+        </form>
+
+```
+    {% if output %}
+    <div class="output">
+        <h3>Results:</h3>
+        <p><strong>English:</strong> {{ output.eng }}</p>
+        <p><strong>Pardhi:</strong> {{ output.pardhi }}</p>
+        <p><strong>Kolami:</strong> {{ output.kolami }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.getElementById("hindi_input").addEventListener("input", function() {
+    const query = this.value;
+    if (query.length === 0) {
+        document.getElementById("suggestions").innerHTML = "";
+        return;
+    }
+
+    fetch(`/suggest?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+            let list = "";
+            data.forEach(item => {
+                list += `<li onclick="selectSuggestion('${item}')">${item}</li>`;
+            });
+            document.getElementById("suggestions").innerHTML = list;
+        });
+});
+
+function selectSuggestion(text) {
+    document.getElementById("hindi_input").value = text;
+    document.getElementById("suggestions").innerHTML = "";
+}
+
+function startVoiceInput() {
+    if ('webkitSpeechRecognition' in window) {
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'hi-IN';
+        recognition.start();
+
+        recognition.onresult = function(event) {
+            document.getElementById("hindi_input").value = event.results[0][0].transcript;
+        };
+
+        recognition.onerror = function(event) {
+            alert("Voice recognition error: " + event.error);
+        };
+    } else {
+        alert("Sorry, your browser does not support voice input.");
+    }
+}
+</script>
+```
+
+</body>
+</html>

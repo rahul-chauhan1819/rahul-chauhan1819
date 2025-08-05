@@ -1,20 +1,42 @@
 <!DOCTYPE html>
+
 <html>
 <head>
     <title>Tribal Language Translator</title>
     <style>
-        body { font-family: Arial; text-align: center; margin-top: 50px; }
-        input, button { padding: 10px; margin: 10px; width: 300px; }
-        .output { margin-top: 30px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(to right, #6a11cb, #2575fc); margin: 0; padding: 0; }
+        .container { background: #fff; padding: 40px; border-radius: 12px; max-width: 600px; margin: 60px auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        h1 { color: #333; }
+        input, button { padding: 12px; margin: 10px 0; width: 100%; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        button { background-color: #2575fc; color: white; border: none; transition: 0.3s; }
+        button:hover { background-color: #6a11cb; }
+        #suggestions { border: 1px solid #ccc; background: #f9f9f9; position: absolute; max-height: 150px; overflow-y: auto; width: 90%; left: 5%; z-index: 10; border-radius: 5px; }
+        #suggestions li { padding: 8px; cursor: pointer; }
+        #suggestions li:hover { background: #e0e0e0; }
+        .output { margin-top: 30px; text-align: left; background: #f1f1f1; padding: 15px; border-radius: 8px; }
+        .output p { margin: 8px 0; }
     </style>
 </head>
 <body>
-    <h1>Tribal Multilingual Translator</h1>
-    <form method="POST">
-        <!-- autocomplete -->
-<input type="text" name="hindi_text" id="hindi_input" placeholder="हिंदी में लिखिए..." autocomplete="off" required>
+    <div class="container">
+        <h1>🌿 Tribal Multilingual Translator</h1>
+        <form method="POST">
+            <input type="text" name="hindi_text" id="hindi_input" placeholder="हिंदी या Hinglish में लिखिए..." autocomplete="off" required>
+            <button type="button" onclick="startVoiceInput()">🎤 Voice Search</button>
+            <ul id="suggestions" style="list-style: none; padding: 0; margin: 0;"></ul>
+            <button type="submit">🌐 Translate</button>
+        </form>
 
-<ul id="suggestions" style="list-style: none; padding: 0;"></ul>
+```
+    {% if output %}
+    <div class="output">
+        <h3>Translation Results:</h3>
+        <p><strong>English:</strong> {{ output.eng }} <button onclick="speakText('{{ output.eng }}', 'en-US')">🔊</button></p>
+        <p><strong>Pardhi:</strong> {{ output.pardhi }} <button onclick="speakText('{{ output.pardhi }}', 'hi-IN')">🔊</button></p>
+        <p><strong>Kolami:</strong> {{ output.kolami }} <button onclick="speakText('{{ output.kolami }}', 'hi-IN')">🔊</button></p>
+    </div>
+    {% endif %}
+</div>
 
 <script>
 document.getElementById("hindi_input").addEventListener("input", function() {
@@ -29,7 +51,7 @@ document.getElementById("hindi_input").addEventListener("input", function() {
         .then(data => {
             let list = "";
             data.forEach(item => {
-                list += `<li onclick="selectSuggestion('${item}')">${item}</li>`;
+                list += `<li onclick=\"selectSuggestion('${item}')\">${item}</li>`;
             });
             document.getElementById("suggestions").innerHTML = list;
         });
@@ -39,20 +61,35 @@ function selectSuggestion(text) {
     document.getElementById("hindi_input").value = text;
     document.getElementById("suggestions").innerHTML = "";
 }
+
+function startVoiceInput() {
+    if ('webkitSpeechRecognition' in window) {
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'hi-IN';
+        recognition.start();
+
+        recognition.onresult = function(event) {
+            document.getElementById("hindi_input").value = event.results[0][0].transcript;
+        };
+
+        recognition.onerror = function(event) {
+            alert("Voice recognition error: " + event.error);
+        };
+    } else {
+        alert("Sorry, your browser does not support voice input.");
+    }
+}
+
+function speakText(text, lang) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    utterance.pitch = 1.2;
+    utterance.rate = 0.95;
+    utterance.volume = 1;
+    window.speechSynthesis.speak(utterance);
+}
 </script>
+```
 
- <!-- end autocomplete -->
-        <br>
-        <button type="submit">Translate</button>
-    </form>
-
-    {% if output %}
-    <div class="output">
-        <h3>Results:</h3>
-        <p><strong>English:</strong> {{ output.eng }}</p>
-        <p><strong>Pardhi:</strong> {{ output.pardhi }}</p>
-        <p><strong>Kolami:</strong> {{ output.kolami }}</p>
-    </div>
-    {% endif %}
 </body>
 </html>
